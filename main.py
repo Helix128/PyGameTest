@@ -180,3 +180,4 @@ while running:
 
 pygame.quit()
 
+# completos a luca
