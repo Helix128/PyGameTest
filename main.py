@@ -42,7 +42,7 @@ def rotate_triangle_ang(center, scale, angle):
 
 pygame.init()
 pygame.display.set_caption("Wave")
-screen = pygame.display.set_mode((1024, 1024))
+screen = pygame.display.set_mode((1600, 900))
 clock = pygame.time.Clock()
 running = True
 deltaTime = 0.0
@@ -83,8 +83,8 @@ boostTimer = 2.0
 canBoost = True
 invulnerable = False
 
-light = pygame.Vector2(0,4)
-maxShadowIter = 4
+light = pygame.Vector2(0,6)
+maxShadowIter = 6
 
 pygame.font.init() 
 
@@ -111,14 +111,14 @@ while running:
     mouse_position = pygame.mouse.get_pos()
    
     
-    px = pygame.math.lerp(px,center.x+velocity.x*5,(deltaTime*6))
-    py = pygame.math.lerp(py,center.y+velocity.y*5,(deltaTime*6))
+    px = pygame.math.lerp(px,center.x+velocity.x*5,min(deltaTime*6,1))
+    py = pygame.math.lerp(py,center.y+velocity.y*5,min(deltaTime*6,1))
     pSize = 8
     playerRect = Rect(px-pSize/2,py-pSize/2,pSize,pSize)
 
     if velocity.x!=0 or velocity.y!=0:
         pdirection = (center.x-velocity.x*100,center.y-velocity.y*100)
-        sAngle = angle_lerp(sAngle,angle,deltaTime*15  )
+        sAngle = angle_lerp(sAngle,angle,deltaTime*20  )
     for z in trails:
         e = trails.index(z)
         pygame.draw.circle(screen,pygame.color.Color(255-e*4,255-e*4,255-e*4,255),z-playerPos,4)
@@ -144,7 +144,7 @@ while running:
             pygame.draw.polygon(screen,shadowColor, pShadow) 
         
         pygame.draw.polygon(screen, color, points)    
-        score+=deltaTime*100
+        score+=deltaTime*763
         keys = pygame.key.get_pressed()
         if keys[pygame.K_w]:
            playerPos.y -= speed * deltaTime
@@ -163,7 +163,7 @@ while running:
         resText = font.render(str(int(respawnTimer*10)/10), False, (0,0,0))
         screen.blit(resText,(center.x-18,center.y+5))
         respawnTimer-=deltaTime
-        pygame.draw.circle(screen, pygame.color.Color(int((1-respawnTimer)*255),126+int((1.0-respawnTimer/2)*127),int((1-respawnTimer)*255),255), center, 16-respawnTimer*16)
+        pygame.draw.circle(screen, "black", center, (respawnTimer)*16)
     if boostTimer>=0.05 and canBoost==False:
         speed/=8
         canBoost = True
@@ -225,7 +225,7 @@ while running:
 
   
 
-    deltaTime = clock.tick(999999) / 1000   
+    deltaTime = clock.tick(144) / 1000   
 
  
     spawnTimer+=deltaTime
