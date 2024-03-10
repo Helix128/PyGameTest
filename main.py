@@ -70,21 +70,21 @@ py = center.y
 score = 0.0
 highscore = 0.0
 
-speed = 400.0
+speed = 550.0
 
 respawnTimer = -1.0
 
 velocity = pygame.Vector2(0,0)
 
 DEBUG_HITBOX = False
-
+fps = 0.0
 boostTimer = 2.0
 
 canBoost = True
 invulnerable = False
 
-light = pygame.Vector2(0,6)
-maxShadowIter = 6
+light = pygame.Vector2(0,5)
+maxShadowIter =5
 
 pygame.font.init() 
 
@@ -129,13 +129,14 @@ while running:
     oldPos = pygame.Vector2(playerPos.x,playerPos.y)
     if respawnTimer<=0: 
         color = pygame.color.Color(0,0,0,255)
-        shadowColor = pygame.color.Color(65,65,110,255)
+        shadowColor = pygame.color.Color(45,45,95,255)
         if invulnerable:
-            color.r = 127
-            color.a= 2
+            color.r = 190
+            color.b = 190
+            color.g = 190
         elif canBoost and boostTimer>=1:
             color.b = 255
-            shadowColor.b = 255
+            shadowColor.b = 166
 
         shadowIter = 0
         while shadowIter<maxShadowIter:
@@ -155,7 +156,7 @@ while running:
         if keys[pygame.K_d]:    
             playerPos.x += speed * deltaTime
         if keys[pygame.K_SPACE] and len(velocity)!=0 and canBoost and boostTimer>=1:    
-            speed*=8
+            speed*=16
             canBoost = False
             invulnerable = True
             boostTimer=0
@@ -164,8 +165,8 @@ while running:
         screen.blit(resText,(center.x-18,center.y+5))
         respawnTimer-=deltaTime
         pygame.draw.circle(screen, "black", center, (respawnTimer)*16)
-    if boostTimer>=0.05 and canBoost==False:
-        speed/=8
+    if boostTimer>=0.025 and canBoost==False:
+        speed/=16
         canBoost = True
     if boostTimer>=0.25 and invulnerable:
         invulnerable=False
@@ -214,7 +215,7 @@ while running:
             pygame.draw.circle(screen,pygame.color.Color(160,65,65,255),(epos.x,epos.y)+light*shadowIter/maxShadowIter,escale*0.6)
         
         pygame.draw.circle(screen,"red",epos,escale*0.6)
-        points = rotate_triangle((epos.x,epos.y)+directions[i].normalize()*escale*0.7, escale/8, epos+directions[i]*100)
+        points = rotate_triangle((epos.x,epos.y)+directions[i].normalize()*escale*0.7, escale/7, epos+directions[i]*100)
         pygame.draw.polygon(screen, "darkred", points)   
         if lifetime[i]>5:
             directions.pop(i)
@@ -225,14 +226,14 @@ while running:
 
   
 
-    deltaTime = clock.tick(144) / 1000   
+   
 
  
     spawnTimer+=deltaTime
     gameTimer+=deltaTime
  
-    if spawnTimer>0.05:
-        spawnTimer=0
+    while spawnTimer>0.05:
+        spawnTimer-=0.05
         pos = playerPos+center+pygame.Vector2(screen.get_width()/2.5*([-1,1][random.randrange(2)]),screen.get_height()/2.5*([-1,1][random.randrange(2)]))-velocity*15
         enemies.append(pos)
         npos = pos
@@ -254,6 +255,16 @@ while running:
     screen.blit(hscoreLabel,(16,70))
     hscoreTxt = font.render(str(int(highscore)), False, (0,0,0))
     screen.blit(hscoreTxt,(16,100))
+   
+    deltaTime = clock.tick(0) / 1000  
+    curfps = clock.get_fps()
+    if abs(curfps-fps)>5:
+        fps=curfps
+    fps = lerp(fps,curfps,deltaTime*0.25)
+    fpstext = font.render(str(min(int(fps),999)), False, (0,0,0))
+    screen.blit(fpstext,(screen.get_width()-75,40))
+    fpslabel = font.render("fps", False, (0,0,0))
+    screen.blit(fpslabel,(screen.get_width()-70,16))
     pygame.display.flip()
 
 pygame.quit()
